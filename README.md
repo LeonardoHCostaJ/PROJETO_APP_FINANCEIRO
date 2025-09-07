@@ -6,7 +6,7 @@ Com ele, é possível **controlar contas bancárias, registrar receitas e despes
 
 ---
 
-## 🫡 Diagrama de Classe
+## ⭐ Diagrama de Classe
 ![Diagrama de Classe](Imagens/Diagrama_de_Classe_Projeto_Financeiro.png)
 
 ## ✨ Principais funcionalidades
