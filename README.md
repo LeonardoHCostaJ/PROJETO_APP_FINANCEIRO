@@ -6,7 +6,7 @@ Com ele, é possível **controlar contas bancárias, registrar receitas e despes
 
 ---
 
-## Diagrama de Classe
+## 🫡 Diagrama de Classe
 ![Diagrama de Classe](Imagens/Diagrama_de_Classe_Projeto_Financeiro.png)
 
 ## ✨ Principais funcionalidades
@@ -45,3 +45,7 @@ Ele pode ser usado tanto por usuários comuns quanto como base de estudo para qu
 - Auxílio no planejamento financeiro.  
 - Apoio no cumprimento de metas pessoais.  
 - Base para estudos em desenvolvimento de aplicações web modernas.  
+
+## 🫡 Autores
+- Ana Carolina Dumont Franco
+- Leonardo Henrique Costa
