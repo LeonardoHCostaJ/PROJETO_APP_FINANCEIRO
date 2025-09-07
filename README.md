@@ -7,7 +7,7 @@ Com ele, é possível **controlar contas bancárias, registrar receitas e despes
 ---
 
 ## Diagrama de Classe
-![alt text](../Diagrama_de_Classe_Projeto_Financeiro.png)
+![Diagrama de Classe](Imagens/Diagrama_de_Classe_Projeto_Financeiro.png)
 
 ## ✨ Principais funcionalidades
 - **Cadastro de contas**: registre diferentes contas bancárias ou carteiras e acompanhe os saldos individualmente.
