@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/centroCusto")
+@RequestMapping("/api/centroCustos")
 @Tag(name="Centros de Custo", description = "API para Gerenciamento dos Centros de Custo")
 public class CentroCustoResource {
 

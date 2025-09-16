@@ -1,3 +1,4 @@
+// src/main/java/com/curso/security/JWTUtils.java
 package com.curso.security;
 
 import io.jsonwebtoken.Claims;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -19,43 +21,43 @@ public class JWTUtils {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    private Key key() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** Gera e retorna APENAS o JWT (sem "Bearer ") */
     public String generateToken(String username) {
-        Key key = Keys.hmacShaKeyFor(secret.getBytes());
-        String tokenGerado = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, key)
+                .signWith(key(), SignatureAlgorithm.HS512)
                 .compact();
-        return "Bearer "+tokenGerado;
     }
 
     public boolean isTokenValid(String token) {
-        Claims claims = getClaims(token);
-        if (claims != null) {
-            String username = claims.getSubject();
-            Date expirationDate = claims.getExpiration();
-            Date now = new Date(System.currentTimeMillis());
-            return username != null && expirationDate != null && now.before(expirationDate);
+        try {
+            Claims c = parse(token);
+            Date exp = c.getExpiration();
+            return exp == null || exp.after(new Date());
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     public String getUsername(String token) {
-        Claims claims = getClaims(token);
-        if (claims != null) {
-            return claims.getSubject();
-        }
-        return null;
-    }
-
-    private Claims getClaims(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secret.getBytes())
-                    .parseClaimsJws(token)
-                    .getBody();
+            return parse(token).getSubject();
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Claims parse(String token) {
+        // use parserBuilder para JJWT 0.11.x
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

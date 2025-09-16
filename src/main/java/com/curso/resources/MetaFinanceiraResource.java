@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/metaFinanceira")
+@RequestMapping("/api/metaFinanceira")
 @Tag(name="Meta Financeira", description = "API para Gerenciamento das Metas Financeiras")
 public class MetaFinanceiraResource {
 

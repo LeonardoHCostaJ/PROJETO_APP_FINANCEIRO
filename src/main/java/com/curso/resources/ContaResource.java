@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/conta")
+@RequestMapping("/api/conta")
 @Tag(name="Contas", description = "API para Gerenciamento das Contas")
 public class ContaResource {
 

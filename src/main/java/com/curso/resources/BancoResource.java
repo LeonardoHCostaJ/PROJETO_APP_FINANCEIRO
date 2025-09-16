@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/banco")
+@RequestMapping("/api/bancos")
 @Tag(name="Bancos", description = "API para Gerenciamento dos Bancos")
 public class BancoResource {
 

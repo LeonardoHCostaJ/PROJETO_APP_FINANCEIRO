@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/usuario")
+@RequestMapping("/api/usuario")
 @Tag(name="Usuarios", description = "API para Gerenciamento dos Usuarios")
 public class UsuarioResource {
 

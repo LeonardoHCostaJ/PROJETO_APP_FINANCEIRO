@@ -1,72 +1,83 @@
 package com.curso.security;
 
-import com.curso.services.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String[] PUBLIC_PREFIXES = {
-            "/v3/api-docs",      // OpenAPI JSON (inclui /v3/api-docs/** e /v3/api-docs/{group})
-            "/swagger-ui",       // UI (inclui /swagger-ui/**)
-            "/swagger-ui.html",  // UI html
-            "/h2-console",       // H2 se usar
-            "/auth",             // endpoints públicos de autenticação
-            "/login"             // login se existir
-    };
+    private static final Logger log = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     private final JWTUtils jwtUtils;
-    private final UserDetailsServiceImpl userDetailsService;
 
-    public JWTAuthenticationFilter(JWTUtils jwtUtils, UserDetailsServiceImpl userDetailsService) {
+    public JWTAuthenticationFilter(JWTUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
-        this.userDetailsService = userDetailsService;
-    }
-
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
-        String uri = request.getRequestURI();
-        return uri.startsWith("/v3/api-docs")
-                || uri.startsWith("/swagger-ui")
-                || uri.equals("/swagger-ui.html")
-                || uri.startsWith("/h2-console")
-                || uri.startsWith("/auth")
-                || uri.equals("/login");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        String token = getTokenFromRequest(request);
+        final String path = request.getServletPath();
+        final String method = request.getMethod();
 
-        if (token != null && jwtUtils.isTokenValid(token)) {
-            String username = jwtUtils.getUsername(token);
-            var userDetails = userDetailsService.loadUserByUsername(username);
-
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        // 1) Ignore rotas públicas e OPTIONS
+        if (path.startsWith("/auth/")
+                || path.startsWith("/api/auth/")
+                || path.startsWith("/h2-console")
+                || "OPTIONS".equalsIgnoreCase(method)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        chain.doFilter(request, response);
-    }
+        // 2) Leia UMA vez o header
+        final String header = request.getHeader("Authorization");
 
-    private String getTokenFromRequest(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        if (bearer != null && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
+        // 3) Sem Bearer? apenas siga a cadeia (não bloqueie aqui)
+        if (header == null || !header.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
-        return null;
+
+        // 4) Validar token e autenticar
+        final String token = header.substring(7); // <- é substring(7), sem "beginIndex:"
+        try {
+            // --- AJUSTE ESTES NOMES SEU JWTUtils TIVER OUTROS ---
+            final String username = jwtUtils.getUsername(token);  // ex.: extractUsername / getSubject
+            final boolean valid   = jwtUtils.isTokenValid(token); // ex.: validateToken / isValid
+            // -----------------------------------------------------
+
+            if (valid && username != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                // Se não extrai perfis do token, mande vazio mas TIPADO:
+                Collection<GrantedAuthority> authorities = Collections.emptyList();
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
+                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (Exception e) {
+            // Não responda 403 aqui; apenas logue e deixe o Security decidir
+            log.debug("Falha ao validar JWT: {}", e.getMessage());
+        }
+
+        // 5) Continue a cadeia
+        filterChain.doFilter(request, response);
     }
 }

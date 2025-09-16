@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/lancamento")
+@RequestMapping("/api/lancamento")
 @Tag(name="Lancamentos", description = "API para Gerenciamento dos Lancamentos")
 public class LancamentoResource {
 
