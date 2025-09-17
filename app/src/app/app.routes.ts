@@ -21,6 +21,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./centroCustos/centroCustos.component').then(m => m.CentroCustosComponent),
   },
+      {
+    path: 'metaFinanceiras',
+    loadComponent: () =>
+      import('./metaFinanceiras/metaFinanceiras.component').then(m => m.MetaFinanceirasComponent),
+  },
 
   // login
   {
@@ -30,5 +35,5 @@ export const routes: Routes = [
   },
 
   // fallback
-  { path: '**', redirectTo: 'bancos' },
+  { path: '**', redirectTo: 'login' },
 ];

@@ -50,6 +50,9 @@ import { AuthService } from '../auth.service';
     <nav>
       <a routerLink="/centroCustos">Ir para Centro de Custos</a>
     </nav>
+    <nav>
+      <a routerLink="/metaFinanceiras">Ir para Metas Financeiras</a>
+    </nav>
   </section>
 `,
 styles: [`
