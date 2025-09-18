@@ -26,6 +26,16 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./metaFinanceiras/metaFinanceiras.component').then(m => m.MetaFinanceirasComponent),
   },
+  {
+      path: 'contas',
+    loadComponent: () =>
+      import('./contas/contas.component').then(m => m.ContasComponent),
+  },
+  {
+        path: 'usuarios',
+    loadComponent: () =>
+      import('./usuarios/usuarios.component').then(m => m.UsuariosComponent),
+  },
 
   // login
   {

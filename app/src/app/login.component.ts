@@ -53,6 +53,12 @@ import { AuthService } from '../auth.service';
     <nav>
       <a routerLink="/metaFinanceiras">Ir para Metas Financeiras</a>
     </nav>
+    <nav>
+      <a routerLink="/contas">Ir para Contas</a>
+    </nav>
+    <nav>
+      <a routerLink="/usuarios">Ir para Usuarios</a>
+    </nav>
   </section>
 `,
 styles: [`
