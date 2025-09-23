@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/lancamento")
+@RequestMapping("/api/lancamentos")
 @Tag(name="Lancamentos", description = "API para Gerenciamento dos Lancamentos")
 public class LancamentoResource {
 
@@ -42,7 +42,7 @@ public class LancamentoResource {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(lancamento.getId()).toUri();
 
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(new LancamentoDTO(lancamento));
     }
 
     @PutMapping(value = "/{id}")

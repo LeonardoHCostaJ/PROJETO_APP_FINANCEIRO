@@ -1,49 +1,44 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { LoginComponent } from './login.component';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
 
-  // página de bancos
-  {
-    path: 'bancos',
-    loadComponent: () =>
-      import('./bancos/bancos.component').then(m => m.BancosComponent),
-  },
+  { path: 'login',
+    loadComponent: () => import('./login.component').then(m => m.LoginComponent) },
 
-    {
-    path: 'terceiros',
-    loadComponent: () =>
-      import('./terceiros/terceiros.component').then(m => m.TerceirosComponent),
-  },
-    {
-    path: 'centroCustos',
-    loadComponent: () =>
-      import('./centroCustos/centroCustos.component').then(m => m.CentroCustosComponent),
-  },
-      {
-    path: 'metaFinanceiras',
-    loadComponent: () =>
-      import('./metaFinanceiras/metaFinanceiras.component').then(m => m.MetaFinanceirasComponent),
-  },
-  {
-      path: 'contas',
-    loadComponent: () =>
-      import('./contas/contas.component').then(m => m.ContasComponent),
-  },
-  {
-        path: 'usuarios',
-    loadComponent: () =>
-      import('./usuarios/usuarios.component').then(m => m.UsuariosComponent),
-  },
+  { path: 'home',
+    canActivate: [authGuard],
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent) },
 
-  // login
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./login.component').then(m => m.LoginComponent),
-  },
+  { path: 'lancamentos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./lancamentos/lancamentos.component').then(m => m.LancamentosComponent) },
 
-  // fallback
-  { path: '**', redirectTo: 'login' },
+  { path: 'contas',
+    canActivate: [authGuard],
+    loadComponent: () => import('./contas/contas.component').then(m => m.ContasComponent) },
+
+  { path: 'terceiros',
+    canActivate: [authGuard],
+    loadComponent: () => import('./terceiros/terceiros.component').then(m => m.TerceirosComponent) },
+
+  { path: 'usuarios',
+    canActivate: [authGuard],
+    loadComponent: () => import('./usuarios/usuarios.component').then(m => m.UsuariosComponent) },
+
+  { path: 'centroCustos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./centroCustos/centroCustos.component').then(m => m.CentroCustosComponent) },
+
+  { path: 'bancos',
+    canActivate: [authGuard],
+    loadComponent: () => import('./bancos/bancos.component').then(m => m.BancosComponent) },
+
+  { path: 'metaFinanceiras',
+    canActivate: [authGuard],
+    loadComponent: () => import('./metaFinanceiras/metaFinanceiras.component').then(m => m.MetaFinanceirasComponent) },
+
+  { path: '**', redirectTo: 'home' },
 ];

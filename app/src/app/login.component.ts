@@ -7,7 +7,7 @@ import { AuthService } from '../auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
   <section class="login">
     <h1>Entrar</h1>
@@ -40,25 +40,6 @@ import { AuthService } from '../auth.service';
       <small>Você já está logado.</small>
       <button type="button" (click)="logout()">Sair</button>
     </div>
-
-    <nav>
-      <a routerLink="/bancos">Ir para Bancos</a>
-    </nav>
-    <nav>
-      <a routerLink="/terceiros">Ir para Terceiros</a>
-    </nav>
-    <nav>
-      <a routerLink="/centroCustos">Ir para Centro de Custos</a>
-    </nav>
-    <nav>
-      <a routerLink="/metaFinanceiras">Ir para Metas Financeiras</a>
-    </nav>
-    <nav>
-      <a routerLink="/contas">Ir para Contas</a>
-    </nav>
-    <nav>
-      <a routerLink="/usuarios">Ir para Usuarios</a>
-    </nav>
   </section>
 `,
 styles: [`
@@ -94,7 +75,7 @@ export class LoginComponent {
     if (this.form.invalid) return;
     this.loading = true; this.error = '';
     this.auth.login(this.form.value as any).subscribe({
-      next: () => { this.loading = false; this.router.navigateByUrl(''); },
+      next: () => { this.loading = false; this.router.navigateByUrl('/home'); },
       error: (err) => {
         this.loading = false;
         this.error = (err?.status === 401 || err?.status === 403) ? 'Credenciais inválidas' : 'Falha no login';

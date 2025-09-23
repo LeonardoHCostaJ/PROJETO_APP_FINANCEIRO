@@ -25,11 +25,11 @@
           <input type="number" step="0.01" class="form-control" placeholder="Limite" formControlName="limite">
         </div>
 
-        <div class="col-6 col-md-2">
-          <select class="form-select" formControlName="tipoConta">
-            <option *ngFor="let t of tiposConta" [value]="t">{{ t }}</option>
-          </select>
-        </div>
+<div class="col-6 col-md-2">
+  <select class="form-select" formControlName="tipoConta">
+    <option *ngFor="let t of tiposConta" [value]="t.value">{{ t.label }}</option>
+  </select>
+</div>
 
         <div class="col-6 col-md-3">
           <select class="form-select" formControlName="bancoId">
@@ -77,9 +77,9 @@
           <thead class="table-light">
             <tr>
               <th style="width:80px;">ID</th>
-              <th>Descrição</th>
-              <th style="width:140px;">Saldo</th>
-              <th style="width:140px;">Limite</th>
+              <th style="width:220px;">Descrição</th>
+              <th style="width:90px;">Saldo</th>
+              <th style="width:90px;">Limite</th>
               <th style="width:160px;">Tipo</th>
               <th style="width:200px;">Banco</th>
               <th style="width:200px;">Usuário</th>
@@ -88,7 +88,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let c of metasFiltradas()">
+            <tr *ngFor="let c of contasFiltradas()">
               <td class="text-muted">#{{ c.id }}</td>
 
               <td><input class="form-control form-control-sm" [value]="c.descricao" #d></td>
@@ -97,11 +97,14 @@
 
               <td><input type="number" step="0.01" class="form-control form-control-sm" [value]="c.limite" #l></td>
 
-              <td>
-                <select class="form-select form-select-sm" [value]="c.tipoConta" #t>
-                  <option *ngFor="let op of tiposConta" [value]="op">{{ op }}</option>
-                </select>
-              </td>
+<td>
+  <select class="form-select form-select-sm"
+          [ngModel]="c.tipoConta"
+          [ngModelOptions]="{standalone:true}"
+          #tpc="ngModel">
+    <option *ngFor="let t of tiposConta" [ngValue]="t.value">{{ t.label }}</option>
+  </select>
+</td>
 
               <td>
                 <select class="form-select form-select-sm" [ngModel]="c.banco?.id ?? null" #banco="ngModel">
@@ -124,18 +127,18 @@
                 </select>
               </td>
 
-              <td class="text-end">
-                <button class="btn btn-sm btn-success me-2"
-                        (click)="atualizar(c.id, { 
-                          descricao: d.value,
-                          saldo: toNumber(s.value),
-                          limite: toNumber(l.value),
-                          tipoConta: t.value,
-                          bancoId: banco.value ?? null,
-                          usuarioId: usr.value ?? null,
-                          metaFinanceiraId: mf.value ?? null
-                        })"
-                        [disabled]="carregando()">Salvar</button>
+<td class="text-end">
+  <button class="btn btn-sm btn-success me-2"
+          (click)="atualizar(c.id, {
+            descricao: d.value,
+            saldo: toNumber(s.value),
+            limite: toNumber(l.value),
+            tipoConta: tpc.value,             
+            bancoId: banco.value ?? null,
+            usuarioId: usr.value ?? null,
+            metaFinanceiraId: mf.value ?? null
+          })"
+          [disabled]="carregando()">Salvar</button>
 
                 <button class="btn btn-sm btn-outline-danger"
                         (click)="remover(c.id)"

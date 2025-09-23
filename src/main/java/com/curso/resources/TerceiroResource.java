@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/terceiro")
+@RequestMapping("/api/terceiros")
 @Tag(name="Terceiros", description = "API para Gerenciamento dos Terceiros")
 public class TerceiroResource {
 

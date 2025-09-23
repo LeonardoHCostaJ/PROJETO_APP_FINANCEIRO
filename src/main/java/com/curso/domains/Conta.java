@@ -31,8 +31,9 @@ public class Conta {
     @Digits(integer = 9,fraction = 2)
     private BigDecimal limite;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "tipoConta")
+    @Column(name = "tipoConta", nullable = false)
     private TipoConta tipoConta;
 
     @ManyToOne
@@ -66,7 +67,7 @@ public class Conta {
         this.descricao = dto.getDescricao();
         this.saldo = dto.getSaldo();
         this.limite = dto.getLimite();
-        this.tipoConta = TipoConta.toEnum(dto.getTipoConta());
+        this.tipoConta = TipoConta.fromString(dto.getTipoConta());
         this.usuario = dto.getUsuario();
         this.banco = dto.getBanco();
         this.metaFinanceira = dto.getMetaFinanceira();

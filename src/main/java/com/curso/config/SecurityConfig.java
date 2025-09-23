@@ -31,7 +31,8 @@ private static final String[] PUBLIC_URLS = {
     "/auth/**",
     "/api/auth/**",                 
     "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml",
-    "/api/swagger-ui/**", "/api/v3/api-docs/**" 
+    "/api/swagger-ui/**", "/api/v3/api-docs/**" ,
+    "/error"
 };
 
     private final Environment env;

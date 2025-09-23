@@ -9,7 +9,7 @@ export interface Terceiro {
 
 @Injectable({ providedIn: 'root' })
 export class TerceirosService {
-  private readonly API = '/api/terceiro';
+  private readonly API = '/api/terceiros';
 
   constructor(private http: HttpClient) {}
 

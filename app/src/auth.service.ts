@@ -4,7 +4,6 @@ import { map, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
 type LoginBody = { username: string; password: string };
-// Ajuste o tipo conforme seu backend: { token: string } ou string "Bearer xxx"
 type LoginResponse = { token: string } | string;
 
 const TOKEN_KEY = 'token';

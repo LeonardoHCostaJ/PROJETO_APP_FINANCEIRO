@@ -23,9 +23,17 @@ public enum TipoConta {
 
     public static TipoConta fromString(String valor) {
         if (valor == null) return null;
+        String x = valor.trim();
+
+        try {
+            int maybeId = Integer.parseInt(x);
+            for (TipoConta v : values()) if (v.id == maybeId) return v;
+        } catch (NumberFormatException ignore) { }
+
         for (TipoConta v : values()) {
-            if (valor.equalsIgnoreCase(v.name()) || valor.equalsIgnoreCase(v.descricao)) return v;
+            if (v.name().equalsIgnoreCase(x)) return v;
+            if (v.getDescricao() != null && v.getDescricao().equalsIgnoreCase(x)) return v;
         }
-        throw new IllegalArgumentException("TipoConta inválido: " + valor);
+        throw new IllegalArgumentException("Situação inválida: " + valor);
     }
 }

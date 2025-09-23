@@ -1,8 +1,8 @@
 package com.curso.domains.enums;
 
 public enum Situacao {
-    ABERTO(0, "Aberto"),
-    BAIXADO(1, "Baixado");
+    ABERTO(0,"Aberto"),
+    BAIXADO(1,"Baixado");
 
     private final int id;
     private final String descricao;
@@ -15,14 +15,22 @@ public enum Situacao {
     public static Situacao toEnum(Integer id) {
         if (id == null) return null;
         for (Situacao v : values()) if (v.id == id) return v;
-        throw new IllegalArgumentException("Situacao inválida: " + id);
+        throw new IllegalArgumentException("Situação inválida: " + id);
     }
 
     public static Situacao fromString(String valor) {
         if (valor == null) return null;
+        String x = valor.trim();
+
+        try {
+            int maybeId = Integer.parseInt(x);
+            for (Situacao v : values()) if (v.id == maybeId) return v;
+        } catch (NumberFormatException ignore) { }
+
         for (Situacao v : values()) {
-            if (valor.equalsIgnoreCase(v.name()) || valor.equalsIgnoreCase(v.descricao)) return v;
+            if (v.name().equalsIgnoreCase(x)) return v;
+            if (v.getDescricao() != null && v.getDescricao().equalsIgnoreCase(x)) return v;
         }
-        throw new IllegalArgumentException("Situacao inválida: " + valor);
+        throw new IllegalArgumentException("Situação inválida: " + valor);
     }
 }

@@ -20,26 +20,29 @@ export class ContasComponent {
   carregando = signal(false);
   erro = signal<string | null>(null);
 
-  // combos
   bancos = signal<IdNome[]>([]);
   usuarios = signal<IdNome[]>([]);
   metas = signal<IdNome[]>([]);
 
-  // enum do front (ajuste para casar com o Enum do back-end)
-  tiposConta = ['CORRENTE', 'POUPANCA', 'CREDITO', 'OUTRA'];
+  tiposConta = [
+  { value: 'CONTA_CORRENTE',     label: 'Conta Corrente' },
+  { value: 'CONTA_INVESTIMENTO', label: 'Conta Investimento' },
+  { value: 'CARTAO_CREDITO',     label: 'Cartão de Crédito' },
+  { value: 'CARTAO_ALIMENTACAO', label: 'Cartão Alimentação' },
+  { value: 'POUPANCA',           label: 'Poupança' },
+] as const;
 
-  // form de criação
-  form = this.fb.group({
-    descricao: ['', Validators.required],
-    saldo: [0 as number, Validators.required],
-    limite: [0 as number, Validators.required],
-    tipoConta: [this.tiposConta[0], Validators.required],
-    usuarioId: [null as number | null],
-    bancoId: [null as number | null],
-    metaFinanceiraId: [null as number | null],
-  });
+form = this.fb.group({
+  descricao: ['', Validators.required],
+  saldo: [0 as number, Validators.required],
+  limite: [0 as number, Validators.required],
+  tipoConta: [this.tiposConta[0].value, Validators.required],  // << aqui
+  usuarioId: [null as number | null],
+  bancoId: [null as number | null],
+  metaFinanceiraId: [null as number | null],
+});
 
-  metasFiltradas = computed(() => {
+  contasFiltradas = computed(() => {
     const f = this.filtro().trim().toLowerCase();
     const arr = this.contas();
     if (!f) return arr;
@@ -70,18 +73,31 @@ export class ContasComponent {
   }
 
   criar() {
-    if (this.form.invalid) return;
-    const payload: ContaPayload = this.form.getRawValue();
-    this.carregando.set(true);
-    this.erro.set(null);
-    this.api.criar(payload).subscribe({
-      next: () => { this.form.reset({
-        descricao: '', saldo: 0, limite: 0, tipoConta: this.tiposConta[0],
+  if (this.form.invalid) return;
+
+  const payload: ContaPayload = this.form.getRawValue();
+  console.log('FORM payload =>', payload);
+
+  this.carregando.set(true);
+  this.erro.set(null);
+
+  this.api.criar(payload).subscribe({
+    next: () => {
+      this.form.reset({
+        descricao: '', saldo: 0, limite: 0, tipoConta: this.tiposConta[0].value,
         usuarioId: null, bancoId: null, metaFinanceiraId: null
-      }); this.carregarTudo(); },
-      error: () => { this.erro.set('Falha ao criar conta'); this.carregando.set(false); }
-    });
-  }
+      });
+      this.carregarTudo();
+    },
+    error: (err) => {
+      console.error('BACK error =>', err);
+      const msg = err?.error?.message || err?.error?.error || err?.message || 'Falha ao criar conta';
+      this.erro.set(msg);
+      this.carregando.set(false);
+    }
+  });
+}
+
 
   atualizar(id: number, dto: Partial<ContaPayload>) {
     this.carregando.set(true);

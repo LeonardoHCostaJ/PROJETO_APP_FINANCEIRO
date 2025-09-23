@@ -1,8 +1,8 @@
 package com.curso.domains.enums;
 
 public enum TipoLancamento {
-    CREDITO(0, "Crédito"),
-    DEBITO(1, "Débito");
+    CREDITO(0,"Credito"),
+    DEBITO(1,"Debito");
 
     private final int id;
     private final String descricao;
@@ -20,8 +20,18 @@ public enum TipoLancamento {
 
     public static TipoLancamento fromString(String valor) {
         if (valor == null) return null;
+        String x = valor.trim();
+
+        // aceita "0"/"1"
+        try {
+            int maybeId = Integer.parseInt(x);
+            for (TipoLancamento v : values()) if (v.id == maybeId) return v;
+        } catch (NumberFormatException ignore) { }
+
+        // aceita name do enum e descrição
         for (TipoLancamento v : values()) {
-            if (valor.equalsIgnoreCase(v.name()) || valor.equalsIgnoreCase(v.descricao)) return v;
+            if (v.name().equalsIgnoreCase(x)) return v;
+            if (v.getDescricao() != null && v.getDescricao().equalsIgnoreCase(x)) return v;
         }
         throw new IllegalArgumentException("Tipo de Lançamento inválido: " + valor);
     }

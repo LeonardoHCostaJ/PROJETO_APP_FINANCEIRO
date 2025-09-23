@@ -34,18 +34,17 @@ public class LancamentoDTO {
     private LocalDate dataBaixa;
 
     @NotNull(message = "O campo valor do documento não pode ser nulo")
-    @Digits(integer = 6, fraction = 2)
+    @Digits(integer = 15, fraction = 2)
     private BigDecimal valorDocumento;
 
     @NotNull(message = "O campo baixado não pode ser nulo")
-    @Digits(integer = 6, fraction = 2)
+    @Digits(integer = 15, fraction = 2)
     private BigDecimal valorBaixado;
 
-    // Strings para a API
-    private String tipoLancamento; // "CREDITO" ou "DEBITO" (ou "Crédito/Débito" se você converter)
-    private String situacao;       // "ABERTO" ou "BAIXADO", etc.
+    // enviados/recebidos como texto pelo front
+    private String tipoLancamento;
+    private String situacao;
 
-    // Relacionamentos (você está usando os objetos; considere trocar por IDs no futuro)
     private Terceiro terceiro;
     private CentroCusto centroCusto;
     private Conta conta;
@@ -56,13 +55,15 @@ public class LancamentoDTO {
         this.id = lancamento.getId();
         this.descricao = lancamento.getDescricao();
         this.parcela = lancamento.getParcela();
-        this.dataLancamento = lancamento.getDataLancamento(); // <<< estava errado no seu código
+        this.dataLancamento = lancamento.getDataLancamento();
         this.dataVencimento = lancamento.getDataVencimento();
         this.dataBaixa = lancamento.getDataBaixa();
         this.valorDocumento = lancamento.getValorDocumento();
         this.valorBaixado = lancamento.getValorBaixado();
-        this.tipoLancamento = lancamento.getTipoLancamento().name(); // ou getDescricao()
-        this.situacao = lancamento.getSituacao().name();             // ou getDescricao()
+
+        this.tipoLancamento = lancamento.getTipoLancamento().name();
+        this.situacao = lancamento.getSituacao().name();
+
         this.terceiro = lancamento.getTerceiro();
         this.centroCusto = lancamento.getCentroCusto();
         this.conta = lancamento.getConta();

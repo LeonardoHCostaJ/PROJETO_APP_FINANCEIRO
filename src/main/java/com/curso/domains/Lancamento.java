@@ -18,7 +18,7 @@ import java.util.Objects;
 public class Lancamento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // mais simples; se quiser SEQUENCE, defina @SequenceGenerator
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_lancamento")
     private Long id;
 
     @NotNull @NotBlank

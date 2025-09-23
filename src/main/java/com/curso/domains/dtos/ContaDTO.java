@@ -1,7 +1,6 @@
 package com.curso.domains.dtos;
 
 import com.curso.domains.*;
-import com.curso.domains.enums.TipoConta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -11,35 +10,25 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class ContaDTO {
-
     private Long id;
 
     @NotNull(message = "O campo descricao não pode ser nulo")
-    @NotBlank(message = "O campo descircao não pode ser vazio")
+    @NotBlank(message = "O campo descricao não pode ser vazio")
     private String descricao;
 
-    private int tipoConta;
+    @NotNull(message = "O campo tipo de conta não pode ser nulo")
+    // Envie/receba o NOME do enum: CORRENTE, POUPANCA, CREDITO, OUTRA
+    private String tipoConta;
 
-    @NotNull
-    @Column(precision = 11, scale = 2)
-    @Digits(integer = 9,fraction = 2)
+    @NotNull @Digits(integer = 9, fraction = 2)
     private BigDecimal saldo;
 
-    @NotNull
-    @Column(precision = 11, scale = 2)
-    @Digits(integer = 9,fraction = 2)
+    @NotNull @Digits(integer = 9, fraction = 2)
     private BigDecimal limite;
 
-    @ManyToOne
-    @JoinColumn(name = "idusuario")
+    // Em vez de objetos JPA aqui, trafegue só os IDs:
     private Usuario usuario;
-
-    @ManyToOne
-    @JoinColumn(name = "idbanco")
     private Banco banco;
-
-    @ManyToOne
-    @JoinColumn(name = "idmetafinanceira")
     private MetaFinanceira metaFinanceira;
 
     public ContaDTO() {
@@ -48,7 +37,7 @@ public class ContaDTO {
     public ContaDTO(Conta conta) {
         this.id = conta.getId();
         this.descricao = conta.getDescricao();
-        this.tipoConta = conta.getTipoConta().getId();
+        this.tipoConta = conta.getTipoConta().name();
         this.saldo = conta.getSaldo();
         this.limite = conta.getLimite();
         this.usuario = conta.getUsuario();
@@ -72,11 +61,11 @@ public class ContaDTO {
         this.descricao = descricao;
     }
 
-    public int getTipoConta() {
+    public String getTipoConta() {
         return tipoConta;
     }
 
-    public void setTipoConta(int tipoConta) {
+    public void setTipoConta(String tipoConta) {
         this.tipoConta = tipoConta;
     }
 
