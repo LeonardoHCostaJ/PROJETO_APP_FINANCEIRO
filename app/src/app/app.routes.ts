@@ -1,12 +1,12 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { authGuard } from './auth.guard';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
 
   { path: 'login',
-    loadComponent: () => import('./login.component').then(m => m.LoginComponent) },
+    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent) },
 
   { path: 'home',
     canActivate: [authGuard],
@@ -40,5 +40,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./metaFinanceiras/metaFinanceiras.component').then(m => m.MetaFinanceirasComponent) },
 
-  { path: '**', redirectTo: 'home' },
+      { path: 'extrato', loadComponent: () =>
+    import('./extrato/extrato-lancamentos.component')
+      .then(m => m.ExtratoLancamentosComponent) },
+
+  { path: '**', redirectTo: 'home' }
+
 ];

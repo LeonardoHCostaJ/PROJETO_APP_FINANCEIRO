@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgIf } from '@angular/common';
-import { AuthService } from '../auth.service';
+import { AuthService } from './auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -19,13 +19,7 @@ import { AuthService } from '../auth.service';
       <div id="mainNav" class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto" *ngIf="auth.isLoggedIn()">
           <li class="nav-item"><a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/bancos" routerLinkActive="active">Bancos</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/contas" routerLinkActive="active">Contas</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/terceiros" routerLinkActive="active">Terceiros</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/usuarios" routerLinkActive="active">Usuários</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/centroCustos" routerLinkActive="active">Centros de Custo</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/metaFinanceiras" routerLinkActive="active">Metas Financeiras</a></li>
-          <li class="nav-item"><a class="nav-link" routerLink="/lancamentos" routerLinkActive="active">Lançamentos</a></li>
+         <li class="nav-item"><a class="nav-link" routerLink="/extrato" routerLinkActive="active">Extrato</a></li>
         </ul>
 
 <div class="d-flex">

@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 import { routes } from './app/app.routes';
-import { authInterceptor } from './app/auth.interceptor';
+import { authInterceptor } from './app/auth/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
