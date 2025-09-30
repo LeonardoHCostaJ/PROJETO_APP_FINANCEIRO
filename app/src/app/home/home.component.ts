@@ -122,7 +122,7 @@ import Chart from 'chart.js/auto';
 
         <div class="col-12 col-md-3 d-flex gap-2 justify-content-end">
           <button class="btn btn-outline-secondary" (click)="limpar()">Limpar</button>
-          <button class="btn btn-primary" (click)="aplicar()">Aplicar</button>
+          <button class="btn btn-primary" (click)="aplicar()" [disabled]="!hasRequiredFilters()">Aplicar</button>
         </div>
 
         <div class="col-12" *ngIf="erro">
@@ -156,32 +156,56 @@ export class HomeComponent {
   erro: string | null = null;
   msgSemDados = '';
 
-  ngOnInit() {
-    this.api.listar().subscribe({
-      next: (ls) => { this.lancs = ls ?? []; this.drawIfReady(); },
-      error: () => { this.erro = 'Falha ao carregar lançamentos'; }
-    });
-    this.api.listarContas().subscribe({
-      next: (v) => { 
-        this.contas = v ?? []; 
-        if (!this.contaId && this.contas.length) this.contaId = this.contas[0].id;
-        this.drawIfReady();
-      }
-    });
+  private applied = false;
+
+public hasRequiredFilters(): boolean {
+  return !!(this.contaId && this.de && this.ate);
+}
+
+ngOnInit() {
+  this.api.listar().subscribe({
+    next: (ls) => { this.lancs = ls ?? []; this.drawIfReady(); },
+    error: () => { this.erro = 'Falha ao carregar lançamentos'; }
+  });
+  this.api.listarContas().subscribe({
+    next: (v) => {
+      this.contas = v ?? [];
+      if (!this.contaId && this.contas.length) this.contaId = this.contas[0].id;
+      this.drawIfReady();
+    }
+  });
+}
+
+ngAfterViewInit() { this.drawIfReady(); }
+
+aplicar() {
+  this.applied = true;
+  this.redesenhar();
+}
+
+limpar() {
+  this.de = '';
+  this.ate = '';
+  this.usarBaixa = false;
+  this.applied = false;
+  this.chart?.destroy();
+  this.chart = undefined as any;
+  this.msgSemDados = 'Selecione conta, período e clique em Aplicar.';
+}
+
+private drawIfReady() {
+  // espera ter canvas + dados carregados + filtros aplicados
+  if (!this.gastosCentroChart) return;
+  if (!this.lancs.length || !this.contas.length) return;
+  if (!this.applied || !this.hasRequiredFilters()) {
+    // sem aplicar ou filtros incompletos → não desenha
+    this.chart?.destroy();
+    this.chart = undefined as any;
+    this.msgSemDados = 'Selecione conta, período e clique em Aplicar.';
+    return;
   }
-
-  ngAfterViewInit() { this.drawIfReady(); }
-
-  aplicar() { this.redesenhar(); }
-  limpar() { this.de = ''; this.ate = ''; this.usarBaixa = false; this.redesenhar(); }
-
-  private drawIfReady() {
-    // espera ter canvas + algum dado (lancs e contas carregados)
-    if (!this.gastosCentroChart) return;
-    if (!this.lancs.length || !this.contas.length) return;
-    // aguarda um frame para garantir canvas montado
-    requestAnimationFrame(() => this.redesenhar());
-  }
+  requestAnimationFrame(() => this.redesenhar());
+}
 
  private refDateISO(l: Lancamento): string | null {
   const iso = this.usarBaixa ? l.dataBaixaISO : l.dataLancamentoISO;
@@ -227,6 +251,14 @@ private groupByCentroForConta(): Map<string, number> {
 private redesenhar() {
   if (!this.gastosCentroChart) return;
 
+  // só redesenha se aplicou e filtros completos
+  if (!this.applied || !this.hasRequiredFilters()) {
+    this.chart?.destroy();
+    this.chart = undefined as any;
+    this.msgSemDados = 'Selecione conta, período e clique em Aplicar.';
+    return;
+  }
+
   this.chart?.destroy();
   this.msgSemDados = '';
 
@@ -239,7 +271,6 @@ private redesenhar() {
     return;
   }
 
-  // se tudo for zero, o Chart não desenha nada → avise
   const total = data.reduce((s, n) => s + Math.abs(n || 0), 0);
   if (total <= 0) {
     this.msgSemDados = 'Sem valores > 0 no período/conta selecionados.';
@@ -262,6 +293,5 @@ private redesenhar() {
       }
     }
   });
-}
-  ngOnDestroy() { this.chart?.destroy(); }
+}  ngOnDestroy() { this.chart?.destroy(); }
 }

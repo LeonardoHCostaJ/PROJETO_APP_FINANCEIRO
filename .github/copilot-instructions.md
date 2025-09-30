@@ -1,49 +1,62 @@
-# Copilot Instructions for Projeto Financeiro
+## Copilot / AI agent quick instructions — Projeto Financeiro
 
-## Big Picture Architecture
-- **Monorepo structure**: Contains a Java backend (Spring Boot) and an Angular frontend (`app/`).
-- **Backend**: Located in `src/main/java/com/curso/` with configuration in `src/main/resources/`. Handles business logic, persistence, and exposes REST APIs for all core features (accounts, transactions, goals, users).
-- **Frontend**: Located in `app/src/app/`. Implements UI components for banking, transactions, goals, users, etc. Uses Angular routing and services for API communication.
-- **Data Flow**: Frontend communicates with backend via REST API (see `proxy.conf.json` for local dev proxying).
-- **Class Diagram**: See `Imagens/Diagrama_de_Classe_Projeto_Financeiro.png` for domain model overview.
+This file contains targeted, actionable guidance for AI coding agents working on this repository.
 
-## Developer Workflows
-- **Backend build/test**: Use Maven wrapper (`./mvnw` or `mvnw.cmd`).
-  - Build: `./mvnw clean install`
-  - Run: `./mvnw spring-boot:run`
-  - Test: `./mvnw test` (logs in `prjfinanceiro_test.log*`)
-- **Frontend build/test**:
-  - Dev server: `ng serve` (from `app/`)
-  - Build: `ng build`
-  - Unit tests: `ng test`
-  - E2E tests: `ng e2e`
-- **Debugging**:
-  - Backend: Use Spring Boot dev tools, check logs in `target/` and root log files.
-  - Frontend: Use browser dev tools, Angular CLI live reload.
+## Big-picture architecture (what to know first)
+- Two main parts: backend (Spring Boot, Java 17) and frontend (Angular standalone, in `app/`).
+- Backend code lives under `src/main/java/com/curso`:
+	- REST controllers: `resources/*` (e.g., `AuthController`, `BancoResource`).
+	- Services: `services/*` implement business logic (e.g., `BancoService`, `DBService`).
+	- Entities: `domains/*` and DTOs in `domains/dtos`.
+	- Repositories: `repositories/*` (Spring Data JPA).
+- Frontend lives in `app/` and uses Angular standalone components (lazy-loaded via `loadComponent` in `app/src/app/app.routes.ts`).
 
-## Project-Specific Conventions
-- **Angular**: Feature folders (e.g., `bancos/`, `contas/`, `metaFinanceiras/`) each have `.component.ts`, `.service.ts`, and `.html` files. Routing is split for server/client (`app.routes.server.ts`, `app.routes.ts`).
-- **Java**: Properties files for different environments (`application.properties`, `application-dev.properties`, etc.).
-- **API Security**: Auth handled via Angular `auth.interceptor.ts` and backend user/login endpoints.
-- **Testing**: Backend test logs are written to root as `prjfinanceiro_test.log*`.
+## Key integration points & patterns
+- Authentication: JWT issued by backend (`/auth/login` → `AuthController` → `JWTUtils.generateToken`). Frontend expects/stores token in localStorage key `token` (`app/src/app/auth/auth.service.ts`).
+- Interceptor/Guard: `auth.interceptor.ts` adds `Authorization: Bearer <token>` header; `auth.guard.ts` protects routes.
+- API proxy: frontend `app/proxy.conf.json` proxies `/api` and `/api/auth` to `http://localhost:8080` during `ng serve`.
+- OpenAPI: `springdoc` enabled; UI reachable at `/swagger-ui.html` (properties in `src/main/resources/application.properties`).
 
-## Integration Points & External Dependencies
-- **Frontend/Backend API**: All data flows through REST endpoints. Use Angular services for HTTP calls.
-- **Spring Boot**: Standard dependencies, see `pom.xml`.
-- **Angular**: Standard CLI setup, see `app/package.json`.
+## Build / run / test (concrete commands)
+- Backend (Windows PowerShell):
+```powershell
+./mvnw.cmd test
+./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev   # run with PostgreSQL settings
+./mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=test  # uses in-memory H2 (default in repo)
+```
+- Frontend (Windows PowerShell):
+```powershell
+cd app
+npm install
+npx ng serve --configuration development   # serves at http://localhost:4200 and uses proxy.conf.json
+```
 
-## Key Files & Directories
-- `src/main/java/com/curso/` — Java backend source
-- `src/main/resources/` — Backend configs
-- `app/src/app/` — Angular source code
-- `app/proxy.conf.json` — API proxy config for local dev
-- `Imagens/Diagrama_de_Classe_Projeto_Financeiro.png` — Domain model
-- `README.md`, `app/README.md` — Project and frontend docs
+## Project-specific conventions (follow these)
+- Controllers in `resources/*` return DTOs (not entities) and use `@RequestMapping("/api/...")` — maintain DTO usage when adding endpoints.
+- Services contain transactional/business code; repositories are thin Spring Data interfaces. Add logic to `services/*`, not controllers.
+- JWTs: backend `JWTUtils.generateToken` returns raw token (no "Bearer "). Frontend `AuthService` strips an optional "Bearer " prefix if present and persists just the token string.
+- Entity scanning and repo packages are explicit in `ProjetoFinanceiroApplication.java` — keep classes under `com.curso.*` so component scan and JPA scan work.
 
-## Example Patterns
-- To add a new feature: create a folder in `app/src/app/`, add `.component.ts`, `.service.ts`, `.html`, and update routing.
-- To expose a new backend API: add a controller in `src/main/java/com/curso/`, update service/repository, and document endpoint in README if needed.
+## Examples to copy/paste
+- Login request (backend expects `CredenciaisDTO` JSON):
+```json
+POST /auth/login
+{ "username": "user", "password": "secret" }
+```
+Response: `{ "token": "<JWT>" }` (controller wraps token in `TokenDTO`).
 
----
+## Tests and profiles
+- Integration tests use H2 and are configured by `application-test.properties` (in-memory DB). Use `-Dspring-boot.run.profiles=test` for test-like environment.
 
-For questions or unclear conventions, check the main `README.md` or ask for clarification.
+## When editing code, quick checklist
+1. Update or add DTOs under `src/main/java/com/curso/domains/dtos` for any public API changes.
+2. Register new entities under `com.curso.domains` and ensure `@Entity` imports are in scanned packages.
+3. Add repository under `com.curso.repositories` and a service in `com.curso.services`.
+4. Add controller in `com.curso.resources` with OpenAPI annotations if it is a public API (see `BancoResource` for style).
+5. If changing endpoints used by frontend, update `app/` calls or proxy rules accordingly.
+
+## Files to inspect for more context
+- Backend: `ProjetoFinanceiroApplication.java`, `AuthController.java`, `JWTUtils.java`, `BancoResource.java`, `DBService.java`.
+- Frontend: `app/src/app/auth/*`, `app/src/app/app.routes.ts`, `app/proxy.conf.json`, `app/README.md`.
+
+If any section is unclear or you want more examples (tests, DTO patterns, or a sample endpoint implementation), tell me which area to expand and I will iterate.

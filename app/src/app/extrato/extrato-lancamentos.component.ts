@@ -66,6 +66,9 @@ ngOnInit() {
     });
   });
 }
+private readonly excluirSituacoes = new Set(['ABERTA','ABERTO','EM_ABERTO']);
+private isAberta = (l: Lancamento) =>
+  this.excluirSituacoes.has(String(l.situacao ?? '').trim().toUpperCase());
 
   private inRange(dateISO?: string | null, de?: string, ate?: string) {
     if (!de && !ate) return true;
@@ -93,20 +96,22 @@ ngOnInit() {
   });
 });
 
+listaExtrato = computed(() => this.lista().filter(l => !this.isAberta(l)));
+
   // totais / saldos (por documento e por baixa)
   totCreditoDoc = computed(() =>
-    this.lista().reduce((s,l)=> s + (l.tipoLancamento==='Credito' ? (l.valorDocumento||0) : 0), 0)
+    this.listaExtrato().reduce((s,l)=> s + (l.tipoLancamento==='Credito' ? (l.valorDocumento||0) : 0), 0)
   );
   totDebitoDoc = computed(() =>
-    this.lista().reduce((s,l)=> s + (l.tipoLancamento==='Debito' ? (l.valorDocumento||0) : 0), 0)
+    this.listaExtrato().reduce((s,l)=> s + (l.tipoLancamento==='Debito' ? (l.valorDocumento||0) : 0), 0)
   );
   saldoDoc = computed(() => this.totCreditoDoc() - this.totDebitoDoc());
 
   totCreditoBaix = computed(() =>
-    this.lista().reduce((s,l)=> s + (l.tipoLancamento==='Credito' ? (l.valorBaixado||0) : 0), 0)
+    this.listaExtrato().reduce((s,l)=> s + (l.tipoLancamento==='Credito' ? (l.valorBaixado||0) : 0), 0)
   );
   totDebitoBaix = computed(() =>
-    this.lista().reduce((s,l)=> s + (l.tipoLancamento==='Debito' ? (l.valorBaixado||0) : 0), 0)
+    this.listaExtrato().reduce((s,l)=> s + (l.tipoLancamento==='Debito' ? (l.valorBaixado||0) : 0), 0)
   );
   saldoBaix = computed(() => this.totCreditoBaix() - this.totDebitoBaix());
 
